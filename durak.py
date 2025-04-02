@@ -67,3 +67,26 @@ class Player:
 
     def __getitem__(self, item):
         return self.cards[item]
+    
+    
+class Durak:
+    def __init__(self, rng: random.Random = None):
+        self.rng = rng or random.Random()  # генератор случайных чисел
+
+        self.deck = list(DECK)  # копируем колоду
+        self.rng.shuffle(self.deck)  # мешаем карты в копии колоды
+
+        # создаем игроков и раздаем им по 6 карт из перемешанной колоды
+        self.players = [Player(i, []).take_cards_from_deck(self.deck)
+                        for i in range(N_PLAYERS)]
+
+        # козырь - карта сверху
+        self.trump = self.deck[0][1]
+        # кладем козырь под низ вращая список по кругу на 1 назад
+        self.deck = rotate(self.deck, -1)
+
+        # игровое поле: ключ - атакующая карта, значения - защищающаяся или None
+        self.field = {}  
+
+        self.attacker_index = 0  # индекс атакующего игрока
+        self.winner = None  # индекс победителя
